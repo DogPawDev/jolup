@@ -1,8 +1,18 @@
 # pharmacy-admin
  
+## 미리보기
+
+- 바코드 입력
+<img alt="barcode" src="https://user-images.githubusercontent.com/18084932/144856676-1527de09-58de-4b27-af47-2d70aa7fc46c.gif">
+- 엑셀 입력
+<img alt="ex" src="https://user-images.githubusercontent.com/18084932/144856899-06780a9b-4821-4be2-823f-a2cecdfcd75d.gif">
+- 공지사항 및 운영시간 설정
+<img alt="notice" src="https://user-images.githubusercontent.com/18084932/144857747-a47317b8-95d7-4fdf-b4fe-9ae3465c91fe.gif">
+
 ## 개발 목적
 
 ---
+- Front와 Back-end를 분리를 통해 유지보수의 이점을 경험
 - 개인 사업자(약국)가 보유하고 있는 약품의 재고와 정보를 WEB으로 표현해 Back-end와 Front-end의 전반적인 프로세스를 경험하기
 - 보유하고 있는 일반 의약품의 정보를 쉽게 등록할 수 있는 솔루션을 구현
 
@@ -23,6 +33,12 @@
 ## 사용 기술
 
 ---
+- 바코드 처리 관련 (해당 프로젝트에 포함 X - 따로 구현)
+  - Python
+  - Flask
+  - ZBar
+
+---
 - SpringBoot 2.5
 - Maven
 - Mybatis
@@ -34,6 +50,8 @@
 - Bulma CSS Framework
 - FullCalendar - JS Calendar 라이브러리
 - Tabulator - JS Table 라이브러리
+- SheetJS - JS Excel 라이브러리
+
 ## UseCase
 
 ---
@@ -78,3 +96,15 @@
 ## ERD
 
 <img alt="ERD" src="https://user-images.githubusercontent.com/18084932/144841762-c07f5b88-0060-4bde-8c79-779dab9f23ab.png"> 
+
+---
+## Json 응답 데이터 및 DB 조회 결과
+- 운영시간 및 공지사항 설정
+<img alt="json" src="https://user-images.githubusercontent.com/18084932/144849880-865db3f4-3c15-4c08-8c11-3da5d4a863ba.png">
+- 엑셀 데이터 추가 및 설정
+<img alt="ex" src="https://user-images.githubusercontent.com/18084932/144850115-9f7e74fb-66ea-4e43-84b7-02e2c21a5e21.png">
+- DB
+  - 재고목록
+     <img width="641" alt="테이블 캡처 1" src="https://user-images.githubusercontent.com/18084932/144850663-6927b902-b2bb-42d3-a2db-934c2111a071.PNG">
+  - 공지사항 및 운영시간
+    <img width="666" alt="테이블 캡처 2" src="https://user-images.githubusercontent.com/18084932/144850896-549cffb0-182f-462e-8303-24b77496afbe.PNG">
