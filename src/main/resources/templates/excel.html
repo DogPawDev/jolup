@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin</title>
+
+
+    <link rel="stylesheet" href="/CSS/bulma.css">
+    <script src="https://kit.fontawesome.com/533a99162a.js" crossorigin="anonymous"></script>
+
+
+
+    <link href="CSS/tabulator_bulma.css" rel="stylesheet">
+    <script type="text/javascript" src="/JS/tabulator/tabulator.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="columns">
+        <div class="column">
+            <section class="hero is-info welcome is-small">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title">
+                            안녕하세요 [ 5층사랑약국 ]님
+                        </h1>
+                        <h2 class="subtitle">
+                            좋은 하루 ~
+                        </h2>
+                        <a href="/admin" class="is-right"><i class="fas  fa-3x  fa-home"></i> </a>
+                    </div>
+
+                </div>
+            </section>
+            <br>
+
+<!--            엑셀 인식 파트-->
+            <div class="columns">
+                <div class="column">
+                    <div class="card events-card">
+
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                Excel
+                            </p>
+                        </header>
+                        <div class="card-table">
+
+
+                            <div class="content">
+                                <div class="file is-info has-name">
+                                    <label class="file-label">
+                                        <input class="file-input" onchange="excelExport(event)" type="file" name="resume" >
+                                        <span class="file-cta">
+                                          <span class="file-icon">
+                                            <i class="fas fa-upload"></i>
+                                          </span>
+                                          <span class="file-label">
+                                            파일 선택
+                                          </span>
+                                        </span>
+                                        <span class="file-name">
+                                            선택된 파일 없음
+                                        </span>
+                                    </label>
+                                </div>
+
+<!--                                <input type="file" id="excelFile" onchange="excelExport(event)"/>-->
+
+                                <div id="example-table"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+    <div class="columns">
+        <div class="column">
+            <div class="card events-card">
+
+                <header class="card-header">
+                    <button class="is-fullwidth button is-primary is-large" id="send">저장</button>
+                </header>
+
+
+
+
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<script>
+
+    let mainTag = document.querySelector("#main");
+    let sendJsonData;
+    // let hpid = "C1104565";
+    //100세 약국
+
+    // let hpid = "C1107549";
+    //당산 열린 약국
+
+    // let hpid = "C1102945";
+    // //디오빌 약국
+    //
+    let hpid = "C1108001";
+    // //래미안 온누리 약국
+
+
+
+    let adminId = "test02";
+    let exfile;
+
+    let barcodeList=[];
+    let tabledata = [];
+
+
+
+
+
+
+    var table = new Tabulator("#example-table", {
+        height:"311px",
+        addRowPos:"bottom",
+        layout:"fitDataFill",
+        data:tabledata,
+        columns:[
+            {title:"표준코드명", field:"표준코드명", width:300, },
+            {title:"품목기준코드", field:"품목기준코드", width:200,},
+            {title:"제품명", field:"제품명", width:300, },
+            {title:"업체명", field:"업체명", width:200, },
+            {title:"수량", field:"수량", width:200, editor:"input"}
+        ],
+    });
+
+    document.querySelector('#send').addEventListener('click', send);
+    const fileName = document.querySelector('.file-name');
+
+    function excelExport(event){
+        // initText();
+        var input = event.target;
+        var reader = new FileReader();
+        fileName.textContent = input.files[0].name;
+
+
+        reader.onload = function(){
+            var fileData = reader.result;
+            var wb = XLSX.read(fileData, {type : 'binary'});
+            wb.SheetNames.forEach(function(sheetName){
+                var rowObj =XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+                //console.log(JSON.stringify(rowObj));
+                exfile=JSON.stringify(rowObj);
+                for (let i=0; i<rowObj.length;i++){
+                    var obj = rowObj[i];
+                    obj.drugId = obj.품목기준코드;
+                    obj.drugBarcode = obj.표준코드명;
+                    obj.drugName = obj.제품명;
+                    obj.manName = obj.업체명;
+                    obj.cnt = obj.수량;
+                    obj.hpid = hpid;
+                    obj.adminId = adminId;
+                    delete obj.품목기준코드;
+                    delete obj.표준코드명;
+                    delete obj.제품명;
+                    delete obj.업체명;
+                    delete obj.수량;
+                    rowObj[i] = obj;
+                }
+
+                sendJsonData=rowObj;
+                console.log(sendJsonData);
+                for(let i=0;i<sendJsonData.length;i++) {
+                    if (sendJsonData[i].drugBarcode != undefined && barcodeList.indexOf(sendJsonData[i].drugBarcode) == -1) {
+
+                        barcodeList.push(sendJsonData[i].drugBarcode);
+
+                        tabledata.push({
+                            품목기준코드: sendJsonData[i].drugId,
+                            표준코드명: sendJsonData[i].drugBarcode,
+                            제품명: sendJsonData[i].drugName,
+                            업체명: sendJsonData[i].manName,
+                            수량:sendJsonData[i].cnt
+                        })
+                    }
+                }
+                table.replaceData(tabledata);
+
+
+            })
+        };
+        reader.readAsBinaryString(input.files[0]);
+    }
+
+    function send(){
+
+        for(let i=0; i<sendJsonData.length;i++){
+
+            let sendData={
+                "drugId":sendJsonData[i].drugId,
+                "drugName":sendJsonData[i].drugName,
+                "manName":sendJsonData[i].manName,
+                "cnt":sendJsonData[i].cnt,
+                "hpid":sendJsonData[i].hpid,
+                "drugBarcode":sendJsonData[i].drugBarcode,
+
+            };
+
+            fetch("http://localhost:8080/insertDrug", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body:JSON.stringify(sendData)
+            }).then((response) => console.log(response));
+            location.href="/admin";
+
+
+        }
+
+        console.log(sendJsonData);
+
+    }
+
+
+
+
+
+
+</script>
+
+</body>
+
+</html>

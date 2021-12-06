@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin</title>
+
+
+    <link rel="stylesheet" href="/CSS/bulma.css">
+    <script src="https://kit.fontawesome.com/533a99162a.js" crossorigin="anonymous"></script>
+    <link href="CSS/tabulator_bulma.css" rel="stylesheet">
+    <script type="text/javascript" src="/JS/tabulator/tabulator.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="columns">
+        <div class="column">
+            <section class="hero is-info welcome is-small">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title">
+                            안녕하세요 [ 5층사랑약국 ]님
+                        </h1>
+                        <h2 class="subtitle">
+                            좋은 하루 ~
+                        </h2>
+                    </div>
+                </div>
+            </section>
+<br>
+<!--            간략한 매장 정보 표시-->
+            <section class="info-tiles">
+                <div class="tile is-ancestor has-text-centered">
+                    <div class="tile is-parent">
+                        <article class="tile is-child box">
+                            <p class="title">13</p>
+                            <p class="subtitle">등록된 리뷰</p>
+                        </article>
+                    </div>
+                    <div class="tile is-parent">
+                        <article class="tile is-child box">
+                            <p class="title">4.3</p>
+                            <p class="subtitle">평균 평점</p>
+                        </article>
+                    </div>
+                    <div class="tile is-parent">
+                        <article class="tile is-child box">
+                            <p class="title" id="drugCount">3.4k</p>
+                            <p class="subtitle">보유 약 종류</p>
+                        </article>
+                    </div>
+                    <div class="tile is-parent">
+                        <article class="tile is-child box">
+                            <p class="title">19</p>
+                            <p class="subtitle">재고 신청 수</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <div class="tile is-ancestor">
+                <div class="tile is-vertical is-8">
+                    <div class="tile">
+                        <div class="tile is-parent is-vertical">
+                            <header class="card-header">
+                                <p class="card-header-title">
+                                    현재 운영시간 및 공지사항
+                                </p>
+                               <a href="/notice"><i class="fas fa-3x fa-cogs"></i></a>
+                            </header>
+
+                            <article class="tile is-child notification is-primary">
+
+                                <p class="title" id ="opTime">5층사랑약국 매장의 운영시간은 ??:?? - ??:?? 입니다.</p>
+                                <p class="subtitle" id="opDay">월 화 수 목 금 운영 </p>
+                            </article>
+
+
+                            <article class="tile is-child notification is-warning">
+                                <p class="title" >공지사항
+
+                                </p>
+                                <p class="title" id="notice">공지사항
+
+                                </p>
+                                <p class="subtitle" id="noticeText">현재 설정된 공지가 없습니다.</p>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tile is-parent">
+                    <article class="tile is-child notification is-success">
+                        <div class="content">
+                            <p class="title">재고 등록</p>
+                            <p class="subtitle">Excel, Barcode를 이용해 재고 등록하기</p>
+                            <div class="content">
+                                <div class="columns">
+                                    <div class="column">
+                                        <div class="box">
+
+                                                <a href="/ex" ><i class="fas fa-9x  fa-file-excel"></i></a>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="column">
+
+                                        <div class="box">
+
+                                                <a href="/img"><i class="fas fa-9x fa-barcode"></i></a>
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+
+            </div>
+
+
+<!--            현재 설정된 공지사항 및 운영시간-->
+            <div class="columns">
+                <div class="column">
+                    <div class="card events-card">
+
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                보유 약 목록
+                           </p>
+                        </header>
+
+                        <div class="columns">
+                            <div class="column">
+                                <section class="hero">
+                                    <div class="hero-body">
+                                        <div id="example-table"></div>
+                                    </div>
+                                </section>
+                            </div>
+
+                         </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+            <div class="columns">
+                <div class="column">
+                    <div class="card events-card">
+
+                        <header class="card-header">
+                            <p class="card-header-title">
+                               문의 사항
+                            </p>
+                        </header>
+
+                        <div class="card-table">
+                            <div class="content">
+                                <table class="table is-fullwidth is-striped">
+                                    <tbody id="tbodyTag">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+
+                        <footer class="card-footer">
+                            <a href="#" class="card-footer-item">View All</a>
+                        </footer>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script>
+    let countTag = document.querySelector("#drugCount");
+    let tabledata = [];
+    let tbodyTag = document.querySelector("#tbodyTag");
+
+    let opTime = document.querySelector("#opTime")
+    let opDay = document.querySelector("#opDay")
+
+    let noticeTitle = document.querySelector("#notice")
+    let noticeText = document.querySelector("#noticeText")
+
+    var table = new Tabulator("#example-table", {
+        height:"311px",
+        addRowPos:"bottom",
+        layout:"fitDataFill",
+        data:tabledata,
+        columns:[
+            {title:"표준코드명", field:"표준코드명", width:300, },
+            {title:"품목기준코드", field:"품목기준코드", width:200,},
+            {title:"제품명", field:"제품명", width:300, },
+            {title:"업체명", field:"업체명", width:200, },
+            {title:"수량", field:"수량", width:200, editor:"input"}
+        ],
+    });
+
+    fetch('http://localhost:8080/noticeDB',{
+        method: 'GET',
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res=>res.json())
+        .then((data)=>{
+            console.log(data);
+            let cnt =data.length-1;
+            console.log(cnt);
+            let str="";
+            let tempt = data[cnt].weekDay.length
+
+            opTime.innerHTML="5층사랑약국 매장의 운영시간은"+data[cnt].startTime.toString()+"-"+data[cnt].endTime.toString() +"입니다."
+            for(let i=0; i<data[cnt].weekDay.length;i++){
+                if(data[cnt].weekDay[i] == '0'){
+                    str+="일"
+                }else  if(data[cnt].weekDay[i] == '1')
+                {
+                    str+="월"
+                }else  if(data[cnt].weekDay[i] == '2'){
+                    str+="화"
+                }else  if(data[cnt].weekDay[i] == '3'){
+                    str+="수"
+                }else  if(data[cnt].weekDay[i] == '4'){
+                    str+="목"
+                }else  if(data[cnt].weekDay[i] == '5'){
+                    str+="금"
+                }else  if(data[cnt].weekDay[i] == '6'){
+                    str+="토"
+                }
+
+            }
+
+            console.log(str);
+            opDay.innerHTML=str;
+            noticeTitle.innerHTML=data[cnt].noticeTitle;
+            noticeText.innerHTML=data[cnt].noticeTextarea;
+
+        });
+
+    fetch('http://localhost:8080/DrugList',{
+        method: 'GET',
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res=>res.json())
+        .then((data)=>{
+            console.log(data);
+            countTag.innerHTML = data.length;
+
+
+            for(let i=0; i<data.length;i++){
+                tabledata.push({
+                    품목기준코드: data[i].drugId,
+                    표준코드명: data[i].drugBarcode,
+                    제품명: data[i].drugName,
+                    업체명: data[i].manName,
+                    수량:data[i].cnt
+                })
+            }
+            table.replaceData(tabledata);
+
+        });
+    fetch('http://localhost:8080/QnAList',{
+        method: 'GET',
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res=>res.json())
+        .then((data)=>{
+
+            for(let i=0;i<data.length;i++){
+                tbodyTag.innerHTML ="<tr>"+ "<td width=\"5%\"><i class=\"fa fa-bell-o\"></i></td>" +
+                    "<td >"+data[i].qnaContent+"</td>" +
+                    "</tr>"
+            }
+
+            console.log(data);
+
+
+
+
+        });
+
+
+
+
+
+</script>
+
+
+
+
+
+</body>
+
+</html>

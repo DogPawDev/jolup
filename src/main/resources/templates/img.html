@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin</title>
+
+
+    <link rel="stylesheet" href="/CSS/bulma.css">
+
+    <link href="CSS/tabulator_bulma.css" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/533a99162a.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/JS/tabulator/tabulator.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script type="text/javascript"src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script type="text/javascript"src="/JS/WebRTC/ga.js"></script>
+    <style>
+        #video{
+            width: 500px;
+            height: 300px;
+        }
+        #canvas{
+            width: 0px;
+            height: 0px;
+        }
+    </style>
+
+
+
+
+
+</head>
+
+
+<body>
+
+<div class="container">
+    <div class="columns">
+        <div class="column">
+            <section class="hero is-info welcome is-small">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title">
+                            안녕하세요 [ 5층사랑약국 ]님
+                        </h1>
+                        <h2 class="subtitle">
+                            좋은 하루 ~
+                        </h2>
+                        <a href="/admin" class="is-right"><i class="fas  fa-3x  fa-home"></i> </a>
+                    </div>
+
+                </div>
+            </section>
+            <br>
+
+            <!--            엑셀 인식 파트-->
+            <div class="columns">
+                <div class="column">
+                    <div class="tile is-ancestor">
+                        <div class="tile is-vertical is-8">
+                            <div class="tile">
+                                <div class="tile is-parent is-vertical">
+                                    <header class="card-header">
+                                        <p class="card-header-title">
+                                            Barcode
+                                        </p>
+
+                                    </header>
+
+
+
+                                    <article class="tile is-child notification is-warning">
+                                        <div id="example-table"></div>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tile is-parent">
+                            <article class="tile is-child notification is-success">
+                                <div class="content">
+                                    <p class="title">재고 등록</p>
+                                    <p class="subtitle">Excel, Barcode를 이용해 재고 등록하기</p>
+                                    <div class="select">
+                                        <label for="videoSource">카메라 선택: </label><select id="videoSource"></select>
+                                    </div>
+
+                                    <div class="content">
+
+
+                                        <video id="video" playsinline autoplay></video> <canvas id="canvas"></canvas>
+
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="columns">
+        <div class="column">
+            <div class="card events-card">
+
+                <header class="card-header">
+                    <button class="is-fullwidth button is-primary is-large" id="send">저장</button>
+                </header>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script>
+
+    let mainTag = document.querySelector("#main");
+    let sendJsonData;
+    let hpid = "C1108001";
+    let adminId = "test02";
+    let exfile;
+
+    let barcodeList=[];
+    let tabledata = [];
+
+    document.querySelector('#send').addEventListener('click', send);
+
+    const videoSelect = document.querySelector('select#videoSource');
+    const selectors = [ videoSelect];
+    const videoElement = document.querySelector('video');
+    const canvas = document.getElementById('canvas');
+
+    const fileName = document.querySelector('.file-name');
+
+
+    var table = new Tabulator("#example-table", {
+        height:"511px",
+        addRowPos:"bottom",
+        layout:"fitColumns",
+        data:tabledata,
+        columns:[
+            {title:"표준코드명", field:"표준코드명", width:100, },
+            {title:"품목기준코드", field:"품목기준코드",width:100},
+            {title:"제품명", field:"제품명"  },
+            {title:"업체명", field:"업체명" },
+            {title:"수량", field:"수량",  editor:"input"}
+        ],
+    });
+
+
+
+
+    function gotDevices(deviceInfos) {
+        // Handles being called several times to update labels. Preserve values.
+        const values = selectors.map(select => select.value);
+        selectors.forEach(select => {
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+        });
+        for (let i = 0; i !== deviceInfos.length; ++i) {
+            const deviceInfo = deviceInfos[i];
+            const option = document.createElement('option');
+            option.value = deviceInfo.deviceId;
+            if (deviceInfo.kind === 'videoinput') {
+                option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
+                videoSelect.appendChild(option);
+            } else {
+                //console.log('Some other kind of source/device: ', deviceInfo);
+            }
+        }
+        selectors.forEach((select, selectorIndex) => {
+            if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+                select.value = values[selectorIndex];
+            }
+        });
+    }
+
+    navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+    function gotStream(stream) {
+        window.stream = stream; // make stream available to console
+        videoElement.srcObject = stream;
+        // Refresh button list in case labels have become available
+        return navigator.mediaDevices.enumerateDevices();
+    }
+
+    function handleError(error) {
+        console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+    }
+    function start() {
+        if (window.stream) {
+            window.stream.getTracks().forEach(track => {
+                track.stop();
+            });
+        }
+        //const audioSource = audioInputSelect.value;
+        const videoSource = videoSelect.value;
+        const constraints = {
+            video: {
+                deviceId: videoSource ? {exact: videoSource} : undefined,
+                width: 1920,
+                height: 1080
+            }
+        };
+        // width: 1280,
+        // height: 720
+        // width: 1920,
+        // height: 1080
+
+        // const constraints = {
+        //     audio: {deviceId: audioSource ? {exact: audioSource} : undefined},
+        //     video: {
+        //         deviceId: videoSource ? {exact: videoSource} : undefined,
+        //         width: 1280,
+        //         height: 720
+        //     }
+        // };
+
+
+
+
+        navigator.mediaDevices.getUserMedia(constraints).then(gotStream).then(gotDevices).catch(handleError);
+    }
+
+    videoSelect.onchange = start;
+
+    start();
+
+    function capture() {
+
+        const context = canvas.getContext('2d');
+
+        canvas.width = videoElement.videoWidth
+        canvas.height = videoElement.videoHeight;
+
+        context.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
+
+        let test = canvas.toDataURL('/image/png');
+
+        let arr = test.split("data:image/png;base64,");
+        // console.log(arr[1])
+        fetch("http://localhost:5000/barcode",{
+            method:"POST",
+            headers:{
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                url:arr[1]
+            }),
+        })
+            .then(res=>res.json())
+            .then((data)=>{
+                console.log(data);
+                if(!data.isEmpty && !Object.keys(data).includes('error'))
+                    code(data);
+
+
+                else
+                    console.log("없다");
+            });
+    }
+
+    async function code(code) {
+        fetch("http://localhost:8080/api/find",{
+            method:"POST",
+            headers:{
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(code),
+        })
+            .then(res => res.json())
+            .then(res =>{
+                console.log(res);
+                for(let i=0;i<res.length;i++){
+
+                    if( res[i].barcode != undefined && barcodeList.indexOf(res[i].barcode) == -1 ){
+                        barcodeList.push(res[i].barcode);
+
+                        tabledata.push({
+                            품목기준코드:res[i].productCode,
+                            표준코드명:res[i].barcode,
+                            제품명:res[i].pillName,
+                            업체명:res[i].manName
+                        })
+
+                    }
+                }
+                table.replaceData(tabledata);
+
+
+            });
+
+    }
+
+
+
+    function send(){
+
+        for(let i=0; i<table.getData().length;i++){
+
+            let sendData={
+                "drugId":table.getData()[i].품목기준코드,
+                "drugName":table.getData()[i].제품명,
+                "manName":table.getData()[i].업체명,
+                "cnt":table.getData()[i].수량,
+                "hpid":hpid,
+                "drugBarcode":table.getData()[i].표준코드명,
+
+            };
+
+            fetch("http://localhost:8080/insertDrug", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body:JSON.stringify(sendData)
+            }).then((response) => console.log(response));
+            location.href="/admin";
+
+
+        }
+
+        console.log(sendJsonData);
+
+    }
+    function initialize() {
+
+
+        setInterval(capture,1000)
+
+
+    }
+
+    initialize();
+
+</script>
+
+</body>
+
+</html>

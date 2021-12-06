@@ -3510,7 +3510,9 @@
                               videoConstraints = { facingMode: 'environment' };
                           }
                           else {
-                              videoConstraints = { deviceId: { exact: deviceId } };
+                              videoConstraints = { deviceId: { exact: deviceId }
+
+                              };
                           }
                           constraints = { video: videoConstraints };
                           return [4 /*yield*/, this.decodeFromConstraints(constraints, videoSource, callbackFn)];
@@ -27521,9 +27523,15 @@
                   videoConstraints = { facingMode: 'environment' };
               }
               else {
-                  videoConstraints = { deviceId: { exact: deviceId } };
+                  videoConstraints = {
+                      deviceId: { exact: deviceId }
+
+
+                  };
               }
-              const constraints = { video: videoConstraints };
+              const constraints = {
+                  video: videoConstraints
+              };
               return yield this.decodeFromConstraints(constraints, previewElem, callbackFn);
           });
       }

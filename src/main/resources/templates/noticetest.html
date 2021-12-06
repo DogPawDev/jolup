@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>notice</title>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales-all.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.css">
+    <link rel="stylesheet" href="/CSS/bulma.css">
+
+</head>
+<body>
+
+운영시간 설정 - 캘린더에서 회색은 휴무일 <br>
+<hr>
+id : test01 (약국 관리자 ID) /  C1104565  - hpid (약국 ID값) 로 가정하고 실행
+<br>
+
+<hr>
+<div class="columns" align="center">
+    <div class="column">
+        <label class="checkbox">
+            일<br>
+            <input name="week" value="0" type="checkbox">
+        </label>
+    </div>
+    <div class="column">
+        <label class="checkbox">
+            월<br>
+            <input name="week" value="1"type="checkbox">
+        </label>
+    </div>
+    <div class="column">
+        <label class="checkbox">
+            화<br>
+            <input name="week" value="2" type="checkbox">
+        </label>
+    </div>
+    <div class="column">
+        <label class="checkbox">
+            수<br>
+            <input name="week" value="3" type="checkbox">
+        </label>
+    </div>
+    <div class="column">
+        <label class="checkbox">
+            목<br>
+            <input name="week" value="4" type="checkbox">
+        </label>
+    </div>
+    <div class="column">
+        <label class="checkbox">
+            금<br>
+            <input name="week" value="5" type="checkbox">
+        </label>
+    </div>
+    <div class="column">
+        <label class="checkbox">
+            토<br>
+            <input name="week" value="6" type="checkbox">
+        </label>
+    </div>
+</div>
+
+<hr>
+<div class="field is-horizontal">
+    <div class="field-label">
+        <!-- Left empty for spacing -->
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <button class="button is-primary" id="btn">
+                    체크박스 캘린더 확인
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label is-normal is-center">
+        <label class="label">여는 시간</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" id="opentime" type="text" placeholder="09:00">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label is-normal is-center">
+        <label class="label">닫는 시간</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" id="closetime" type="text" placeholder="18:00">
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+
+<div class="field is-horizontal">
+    <div class="field-label is-normal">
+        <label class="label">공지사항 - 제목</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" id="title" type="text" placeholder="공지사항 제목 입력">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label is-normal">
+        <label class="label">내용</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <textarea class="textarea" id="textarea" placeholder="끄적끄적"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div>
+    <div id='calendar'></div>
+</div>
+
+<hr>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <!-- Left empty for spacing -->
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <button class="button is-primary" id="send">
+                    저장
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <!-- Left empty for spacing -->
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <button class="button is-primary" id="res">
+                    조회
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<script>
+    let opDay=[];
+    let sendJsonData;
+
+    let resData;
+     function res() {
+
+         fetch('http://localhost:8080/noticeDB',{
+            method: 'GET',
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res=>res.json())
+        .then((data)=>{
+            resData = data;
+            console.log((data))
+        });
+
+
+
+    }
+
+        function send(){
+
+        let events = [];
+        let title = document.getElementById("title").value;
+        let textarea = document.getElementById("textarea").value;
+
+        if(opDay.length == 0){
+            console.log("운영 시간 설정 필요")
+            return 0;
+        }
+
+        for(let i=0; i<cal.getEvents().length;i++){
+
+            console.log(cal.getEvents()[i].toJSON());
+            events.push(cal.getEvents()[i].toJSON());
+            console.log(opDay);
+
+
+
+        }
+        sendJsonData={
+            "noticeTitle":title,
+            "noticeTextarea":textarea,
+            "weekDay":opDay,
+            "hpId":"C1104565 ",
+            "adminId":"test01",
+            "events":events,
+            "startTime":document.getElementById("opentime").value,
+            "endTime":document.getElementById("closetime").value
+
+        };
+
+        fetch("http://localhost:8080/insertNotice", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify(sendJsonData)
+        }).then((response) => console.log(response));
+        // JSON.stringify(sendJsonData);
+        console.log(sendJsonData);
+        // console.log(title + textarea);
+
+
+
+    }
+
+    function chekboxBtn(){
+        let chekbox = document.getElementsByName("week");
+        let week =[];
+        for(let i=0; i<chekbox.length;i++){
+            if(chekbox[i].checked==true){
+                console.log(chekbox[i].value);
+                week.push(chekbox[i].value);
+
+                //회색 - 휴무일
+
+            }
+        }
+
+        cal.setOption("businessHours",{
+            daysOfWeek:week,
+            startTime:document.getElementById("opentime").value,
+            endTime:document.getElementById("closetime").value}
+        );
+        opDay = week;
+        console.log(week);
+
+    }
+
+    document.querySelector('#btn').addEventListener('click', chekboxBtn);
+    document.querySelector('#send').addEventListener('click', send);
+    document.querySelector('#res').addEventListener('click', res);
+
+
+</script>
+
+
+<script>
+    var cal=null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            initialView: 'timeGridWeek',
+            aspectRatio: 1.5,
+            locale:"ko",
+
+            // initialDate: '2020-09-12', 값을 지정하지 않는 경우 현재 날짜로 설정
+            navLinks: true, // can click day/week names to navigate views
+            selectable: true,
+            selectMirror: true,
+            select: function(arg) {
+                var title = prompt('일정 제목 : ');
+                if (title) {
+                    calendar.addEvent({
+                        title: title,
+                        start: arg.start,
+                        end: arg.end,
+                        allDay: arg.allDay
+                    })
+                }
+                calendar.unselect()
+            },
+            eventClick: function(arg) {
+                if (confirm('일정을 삭제 하시겠습니까?')) {
+                    arg.event.remove()
+                }
+            },
+            editable: true,
+            dayMaxEvents: true, // allow "more" link when too many events
+            events: [
+                {
+
+                    title:"하루종일 이벤트",
+                    start:"2021-11-01"
+                }
+                // {
+                //     title: 'All Day Event',
+                //     start: '2021-11-01'
+                // },
+                // {
+                //     title: 'Long Event',
+                //     start: '22021-11-07',
+                //     end: '2021-11-10'
+                // },
+                // {
+                //     groupId: 999,
+                //     title: 'Repeating Event',
+                //     start: '2021-11-09T16:00:00'
+                // },
+                // {
+                //     groupId: 999,
+                //     title: 'Repeating Event',
+                //     start: '2021-11-16T16:00:00'
+                // },
+                // {
+                //     title: 'Conference',
+                //     start: '2021-11-11',
+                //     end: '2021-11-13'
+                // },
+                // {
+                //     title: 'Meeting',
+                //     start: '2021-11-12T10:30:00',
+                //     end: '2021-11-12T12:30:00'
+                // },
+                // {
+                //     title: 'Lunch',
+                //     start: '2021-11-12T12:00:00'
+                // },
+                // {
+                //     title: 'Meeting',
+                //     start: '2021-11-12T14:30:00'
+                // },
+                // {
+                //     title: 'Happy Hour',
+                //     start: '2021-11-12T17:30:00'
+                // },
+                // {
+                //     title: 'Dinner',
+                //     start: '2021-11-12T20:00:00'
+                // },
+                // {
+                //     title: 'Birthday Party',
+                //     start: '2021-11-13T07:00:00'
+                // }
+
+            ]
+        });
+        cal = calendar;
+        calendar.render();
+    });
+
+
+
+</script>
+
+</body>
+</html>

@@ -32,11 +32,9 @@
 </head>
 
 <body>
-<video id="test">
-
-</video>
 
 
+<!--
 <form name="form" method="post" action="https://localhost:8080/api/barcode" enctype="multipart/form-data">
     <input name="user" value="Pyo">
     <input name="content" value="Content">
@@ -45,23 +43,38 @@
 
 
 </form>
+-->
+
+
 <section class="section">
     <div class="container">
         <h1 class="title">
-            Hello World
+            제품 등록
         </h1>
         <p class="subtitle">
-            My first website with <strong>Bulma</strong>!
+            핸드폰을 연결 후 <strong>바코드</strong>를 보여주세요!
         </p>
+        <div class="columns">
+            <div class="column">
+                <div class="box" id="div">
 
-        <div class="box">
+                </div>
+            </div>
+            <div class="column"><video id="test"></video></div>
+
         </div>
+
+
+
+
 
 
     </div>
 </section>
 
 <script>
+
+    /*
     var video = document.querySelector("#test");
 
     if (navigator.mediaDevices.getUserMedia) {
@@ -73,6 +86,8 @@
                 console.log("Something went wrong!");
             });
     }
+    */
+
 </script>
 
 
@@ -81,38 +96,97 @@
 
 <script type="text/javascript">
 
-   const codeReader = new ZXingBrowser.BrowserQRCodeReader();
-   const barcodeRe = new ZXingBrowser.BrowserMultiFormatOneDReader();
-   console.log(codeReader);
-   console.log(barcodeRe);
+    var divselc = document.querySelector("#div");
+    const codeReader = new ZXingBrowser.BrowserQRCodeReader();
+    const barcodeRe = new ZXingBrowser.BrowserMultiFormatReader();
 
 
 
 
-   async function f() {
+    console.log(codeReader);
+    console.log(barcodeRe);
+
+
+
+
+    async function f() {
 
         const videoInputDevices = await ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
-        const selectedDeviceId = videoInputDevices[0].deviceId;
+        console.log("기기목록"+videoInputDevices);
+        console.log(videoInputDevices);
+        let selectedDeviceId=null;
+        for (let i = 0; i <videoInputDevices.length ; i++) {
+            if(videoInputDevices[i].label == "EpocCam Camera"){
+                selectedDeviceId = videoInputDevices[i].deviceId;
+                break
+            }
+        }
+
+
         console.log(`Started decode from camera with id ${selectedDeviceId}`);
         const sourceElem = document.querySelector('#test');
 
 // you can use the controls to stop() the scan or switchTorch() if available
-        const controls = await codeReader.decodeFromVideoDevice(selectedDeviceId, sourceElem, (result, error, controls) => {
+        const controls = await barcodeRe.decodeFromVideoDevice(selectedDeviceId, sourceElem, (result, error, controls) => {
             // use the result and error values to choose your actions
             // you can also use controls API in this scope like the controls
             // returned from the method.
 
+
         });
+
         console.log(sourceElem);
-         //const resultVideo = await codeReader.decodeFromVideoElement(previewElem);
+        //const resultVideo = await codeReader.decodeFromVideoElement(previewElem);
         //console.log(resultVideo);
 
 // stops scanning after 20 seconds
-       // setTimeout(() => controls.stop(), 20000);
+        // setTimeout(() => controls.stop(), 20000);
+
+        var barcodeList = [];
 
 
-        const resultVideo = await codeReader.decodeFromVideoElement(sourceElem,function (x) {
+        const resultVideo = await barcodeRe.decodeFromVideoElement(sourceElem,function (x) {
             console.log(x);
+
+
+
+            if (x !== null && x !== undefined){
+
+                if(barcodeList.indexOf(x.text) == -1){
+
+
+
+                    barcodeList.push(x.text);
+                    let code = x.text;
+                    console.log("code :" + x.text);
+
+
+                    fetch("http://localhost:8080/api/find"+"?code="+code)
+                        .then(res => res.json())
+                        .then(res =>{
+                          console.log("리스폰스 값 : "+res.data);
+
+
+                            var node = document.createElement("h1");
+                            node.className="title";
+                            var textnode = document.createTextNode("Barcode : "+x.text+" /"+res.data);
+                            node.appendChild(textnode);
+                            divselc.appendChild(node);
+
+                          //return res.data;
+                        });
+
+
+
+
+
+
+
+                }
+
+
+
+            }
         });
 
 
@@ -124,25 +198,6 @@
     f();
 
 </script>
-
-
-    try {
-
-
-
-
-        const sourceElem = document.querySelector('#1');
-        const resultImage = await codeReader.decodeFromImageElement(sourceElem);
-// or use decodeFromVideoElement for videos
-        const resultVideo = await codeReader.decodeFromVideoElement(sourceElem);
-        console.log(resultVideo);
-
-    }catch (e) {
-        console.log("없다야")
-    }
-
-
-
 
 
 

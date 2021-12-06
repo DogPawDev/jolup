@@ -1,5 +1,6 @@
 package project.eyack.jolup.requestTest;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.google.common.net.MediaType;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
@@ -8,10 +9,17 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.multi.GenericMultipleBarcodeReader;
 import com.google.zxing.multi.MultipleBarcodeReader;
 import com.google.zxing.oned.EAN13Reader;
+import net.minidev.json.JSONObject;
+import org.apache.tomcat.util.json.JSONParser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.json.Json;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jackson.JsonObjectSerializer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +34,7 @@ import javax.validation.Valid;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.io.Writer;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +46,7 @@ import java.util.logging.Level;
 @RequestMapping(value = "/api")
 public class ImgUploadRequestController {
 
+
     @GetMapping(value = "/sel")
     public String sel(){
         EAN13Reader ean13Reader = new EAN13Reader();
@@ -45,6 +55,21 @@ public class ImgUploadRequestController {
         return "sel";
     }
 
+
+
+
+
+
+    @GetMapping(value="/find2")
+    public  String find2(@RequestParam("code") String code) throws IOException{
+
+        URL url = new URL("http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList?ServiceKey=jkp77b%2FGBjh6kqF3EqxXowN2bi%2FV96WiIXpZJdPtd6CVmFr0plKxoFFWfjobZbzRKtBk7iqaIbG2Ju1bwNCjmw%3D%3D&type=json&itemName="+code);
+        JSONObject responseJson = null;
+        return "test";
+
+
+
+    }
 
 
 

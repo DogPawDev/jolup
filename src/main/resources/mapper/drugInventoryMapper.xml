@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+
+<mapper namespace="project.eyack.jolup.mapper.DrugInventoryMapper">
+
+
+
+    <select id="getDrugList"  resultType="project.eyack.jolup.vo.DrugInventory">
+        select * from drugInventory where hpid = 'C1108001';
+    </select>
+
+
+
+    <select id="getQnaList"  resultType="project.eyack.jolup.vo.QnA">
+        select * from QnA;
+    </select>
+
+
+
+    <insert id="insertDrugInventory" >
+        insert into drugInventory(drugId,drugName,manName,cnt,hpid,drugBarcode) values (#{drugId},#{drugName},#{manName},#{cnt},#{hpid},#{drugBarcode});
+    </insert>
+
+
+
+
+
+</mapper>
+

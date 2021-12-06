@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--
+ *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+-->
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="WebRTC code samples">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta itemprop="description" content="Client-side WebRTC code samples">
+    <meta itemprop="image" content="../../../images/webrtc-icon-192x192.png">
+    <meta itemprop="name" content="WebRTC code samples">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <base target="_blank">
+
+    <title>Select audio and video sources</title>
+
+
+
+
+    <style>
+        div.select {
+            display: inline-block;
+            margin: 0 0 1em 0;
+        }
+
+        p.small {
+            font-size: 0.7em;
+        }
+
+        label {
+            width: 12em;
+            display: inline-block;
+        }
+        #video{
+            width: 500px;
+            height: 300px;
+        }
+        #canvas{
+            width: 0px;
+            height: 0px;
+        }
+
+    </style>
+
+    <script type="text/javascript"src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+
+
+
+    <script type="text/javascript"src="/JS/WebRTC/ga.js"></script>
+    <link href="CSS/tabulator_bulma.css" rel="stylesheet">
+    <script type="text/javascript" src="/JS/tabulator/tabulator.js"></script>
+    <script type="text/javascript"src="/JS/WebRTC/SelectVideo.js" async></script>
+</head>
+
+<body>
+<div id="container">
+
+
+    epoccam 설치 후 작동 됩니다.  <br>
+    <br>1. 스마트폰에 epoccam 설치
+    <br>2. 컴퓨터에 epoccam 드라이버 설치
+    <br>
+    <br> 다운로드 - https://www.elgato.com/en/epoccam
+    <br> UI 작업 중 - 이 화면은 테스트 사이트입니다.
+    <br>
+    <br>
+    <br>
+<!--
+    <div class="select">
+        <label for="audioSource">Audio input source: </label><select id="audioSource"></select>
+    </div>
+
+    <div class="select">
+        <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+    </div>
+-->
+    <div class="select">
+        <label for="videoSource">Video source: </label><select id="videoSource"></select>
+    </div>
+
+    <div>
+        <button id="btn-capture">캡처</button>
+    </div>
+    <div>
+        <button id="send">전송</button>
+    </div>
+    <video id="video" playsinline autoplay></video> <canvas id="canvas"></canvas>
+
+
+
+    <div id="main">
+
+    </div>
+
+
+    <div>
+        <button id="add-row">Add Blank Row to bottom</button>
+        <button id="del-row">Remove Row "Oli Bob"</button>
+        <button id="clear">Empty the table</button>
+        <button id="reset">Reset</button>
+        <h4>count<h4 id="total-row">0</h4></h4>
+    </div>
+
+    <div id="example-table"></div>
+
+</div>
+
+<script>
+
+    let mainTag = document.querySelector("#main");
+
+</script>
+
+
+
+
+<script>
+
+</script>
+
+</body>
+</html>
